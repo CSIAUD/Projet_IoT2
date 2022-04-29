@@ -12,4 +12,4 @@
 - Scan Bluetooth
 - Synchronisation AdafruitIO
 - Utilisation du Ticker
-- Utilisation du mode DEBUG
+- Utilisation du Remote DEBUG
