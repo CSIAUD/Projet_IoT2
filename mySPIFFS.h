@@ -31,6 +31,37 @@ String strConfigFile("/config.txt");
 DynamicJsonDocument doc(512);
 
 /**
+ * @brief Reset fichier de configuration
+ * Attribution des valeurs par défaut pour l'AP
+ */
+void setDefault(){
+  if(SPIFFS.begin(true)){
+    if (SPIFFS.exists(strConfigFile)) { 
+      File file = SPIFFS.open(strConfigFile, "w+");
+
+      if (file){
+        DeserializationError error = deserializeJson(doc, file);
+        if (error) {
+            MYDEBUG_PRINT("deserializeJson() failed: ");
+            MYDEBUG_PRINTLN(error.c_str());
+            return;
+        }
+        JsonObject config = doc.createNestedObject("config");
+        config["ssid"] = "IoTeam";
+        config["pwd"] = "29052022";
+
+        doc.add(config);
+        if(serializeJson(doc, file) == 0){
+            MYDEBUG_PRINTLN("Erreur SerializeJson Default");
+        }
+      }else{
+        MYDEBUG_PRINTLN("Ereur Ouverture");
+      }
+    }
+  }
+}
+
+/**
  * @brief Permet la récupération d'un Json Object en fonction du sPath.
  * 
  * @param sPath chemin d'acces dans le spiffs
@@ -56,13 +87,12 @@ JsonObject spiffsGet(String sPath){
             obj = doc[sPath];
         }
       }else{
-        MYDEBUG_PRINTLN("Pas ouvert");
+        MYDEBUG_PRINTLN("Ereur Ouverture");
       }
     } else {
-      MYDEBUG_PRINTLN("SPIFFS => Le fichier de configuration n'existe pas");
+      MYDEBUG_PRINTLN("Ereur Fichier inexistant");
       setDefault();
     }
   }
-  MYDEBUG_PRINTLN("END");
   return obj;
 }
