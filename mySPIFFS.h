@@ -96,3 +96,14 @@ JsonObject spiffsGet(String sPath){
   }
   return obj;
 }
+
+/**
+ * @brief Remet à zéro les fichiers de SPIFFS
+ * Puis redirection sur la page d'accueil
+ */
+void reset(){
+    SPIFFS.format();
+    setDefault();
+    webServer.sendHeader("Location", "/",true);
+    webServer.send(302, "text/plane",""); 
+}
