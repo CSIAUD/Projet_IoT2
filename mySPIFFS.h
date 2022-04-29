@@ -42,7 +42,7 @@ void setDefault(){
       if (file){
         DeserializationError error = deserializeJson(doc, file);
         if (error) {
-            MYDEBUG_PRINT("deserializeJson() failed: ");
+            MYDEBUG_PRINT("deserializeJson() Set failed: ");
             MYDEBUG_PRINTLN(error.c_str());
             return;
         }
@@ -52,10 +52,10 @@ void setDefault(){
 
         doc.add(config);
         if(serializeJson(doc, file) == 0){
-            MYDEBUG_PRINTLN("Erreur SerializeJson Default");
+            MYDEBUG_PRINTLN("Erreur Set SerializeJson Default");
         }
       }else{
-        MYDEBUG_PRINTLN("Ereur Ouverture");
+        MYDEBUG_PRINTLN("Ereur Set Ouverture");
       }
     }
   }
@@ -77,7 +77,7 @@ JsonObject spiffsGet(String sPath){
       if (file){
         DeserializationError error = deserializeJson(doc, file);
         if (error) {
-            MYDEBUG_PRINT("deserializeJson() failed: ");
+            MYDEBUG_PRINT("deserializeJson() Get failed: ");
             MYDEBUG_PRINTLN(error.c_str());
             file.close();
             setDefault();
@@ -87,14 +87,51 @@ JsonObject spiffsGet(String sPath){
             obj = doc[sPath];
         }
       }else{
-        MYDEBUG_PRINTLN("Ereur Ouverture");
+        MYDEBUG_PRINTLN("Ereur Get Ouverture");
       }
     } else {
-      MYDEBUG_PRINTLN("Ereur Fichier inexistant");
+      MYDEBUG_PRINTLN("Ereur Get Fichier inexistant");
       setDefault();
     }
   }
   return obj;
+}
+
+/**
+ * @brief Permet de sauvegarder une valeur
+ * 
+ * @param sPath L'endroit dans lequel stocker l'objet
+ * @param newObj L'objet à stocker
+ */
+void spiffsSet(String sPath, JsonObject newObj){
+    if(SPIFFS.begin(true)){
+    if (SPIFFS.exists(strConfigFile)) { 
+      File file = SPIFFS.open(strConfigFile, "w+");
+
+      if (file){
+        JsonObject obj;
+        DeserializationError error = deserializeJson(doc, file);
+        if (error) {
+            MYDEBUG_PRINT("deserializeJson() failed: ");
+            MYDEBUG_PRINTLN(error.c_str());
+            return;
+        }
+        if(doc.containsKey(sPath)){
+            obj = doc[sPath];
+        }else{
+            obj = doc.createNestedObject(sPath);
+        }
+        obj.add(newObj);
+        doc.add(obj);
+
+        if(serializeJson(doc, file) == 0){
+            MYDEBUG_PRINTLN("Erreur SerializeJson Set");
+        }
+      }else{
+        MYDEBUG_PRINTLN("Ereur Ouverture");
+      }
+    }
+  }
 }
 
 /**

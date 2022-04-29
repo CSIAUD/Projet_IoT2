@@ -13,7 +13,6 @@
  */
 void setup() {
   setupDebug();
-  setupSpiffs();
 }
 
 void loop() {
