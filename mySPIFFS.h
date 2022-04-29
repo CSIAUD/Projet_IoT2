@@ -1,7 +1,7 @@
 /**
- * \file mySPIFFS.h
- * \page spiffs SPIFFS
- * \brief Stockage des fichiers
+ * @file mySPIFFS.h
+ * @page spiffs SPIFFS
+ * @brief Stockage des fichiers
  * 
  * Utilisation de la Bibliothèque ArduinoJson crée par Benoit Blanchon : https://github.com/bblanchon/ArduinoJson
  * 
