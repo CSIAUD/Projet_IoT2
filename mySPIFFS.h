@@ -1,5 +1,5 @@
 /**
- * \file persoSPIFFS.h
+ * \file mySPIFFS.h
  * \page spiffs SPIFFS
  * \brief Stockage des fichiers
  * 
