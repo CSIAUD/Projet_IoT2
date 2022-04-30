@@ -1,7 +1,7 @@
 /**
- * \file Projet_IoT2.ino
- * \page projet Projet IoT B2
- * \brief Projet IoT Contact-tracer
+ * @file Projet_IoT2.ino
+ * @page projet Projet IoT B2
+ * @brief Projet IoT Contact-tracer
  * 
  */
 
@@ -14,6 +14,7 @@
  */
 void setup() {
   setupDebug();
+  setupWifi();
 }
 
 void loop() {
