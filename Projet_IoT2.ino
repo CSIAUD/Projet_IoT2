@@ -7,6 +7,7 @@
 
 #include "Debug.h"
 #include "mySPIFFS.h"
+#include "myWifi.h"
 
 /**
  * \brief Initialisation des fonctionnalités
@@ -15,6 +16,7 @@
 void setup() {
   setupDebug();
   setupWifi();
+  display(spiffsGet("wifis"));
 }
 
 void loop() {
