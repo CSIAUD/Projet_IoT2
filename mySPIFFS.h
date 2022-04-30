@@ -155,6 +155,6 @@ void spiffsSet(String sPath, JsonObject newObj){
 void reset(){
     SPIFFS.format();
     setDefault();
-    webServer.sendHeader("Location", "/",true);
-    webServer.send(302, "text/plane",""); 
+    // webServer.sendHeader("Location", "/",true);
+    // webServer.send(302, "text/plane",""); 
 }
