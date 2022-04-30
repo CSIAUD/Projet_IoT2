@@ -135,7 +135,10 @@ void spiffsSet(String sPath, JsonObject newObj){
         }else{
             obj = doc.createNestedObject(sPath);
         }
-        obj.add(newObj);
+        
+        for(JsonPair elem : newObj){
+          obj[elem.key().c_str()] = elem.value().as<const char*>();
+        }
         doc.add(obj);
 
         if(serializeJson(doc, file) == 0){
