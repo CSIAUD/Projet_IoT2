@@ -36,12 +36,12 @@ DynamicJsonDocument doc(512);
  * @param obj Le Json Object à afficher
  */
 void display(JsonObject obj){
-    for(JsonPair elem : obj){
-        MYDEBUG_PRINT("SPIFFS key : ");
-        MYDEBUG_PRINT(elem.key().c_str());
-        MYDEBUG_PRINT(" || value => ");
-        MYDEBUG_PRINTLN(elem.value().as<char*>())
-    }
+  for(JsonPair elem : obj){
+    MYDEBUG_PRINT("SPIFFS key : ");
+    MYDEBUG_PRINT(elem.key().c_str());
+    MYDEBUG_PRINT(" || value => ");
+    MYDEBUG_PRINTLN(elem.value().as<char*>())
+  }
 }
 
 /**
