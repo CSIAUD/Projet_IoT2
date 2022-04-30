@@ -5,6 +5,8 @@
  * 
  */
 
+#define DEBUG 1
+
 #include "Debug.h"
 #include "mySPIFFS.h"
 
