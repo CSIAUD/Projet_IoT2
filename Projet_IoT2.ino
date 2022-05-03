@@ -5,6 +5,8 @@
  * 
  */
 
+#define DEBUG 1
+
 #include "Debug.h"
 #include "mySPIFFS.h"
 #include "myWifi.h"
@@ -15,8 +17,7 @@
  */
 void setup() {
   setupDebug();
-  setupWifi();
-  display(spiffsGet("wifis"));
+  testSpiffs();
 }
 
 void loop() {
