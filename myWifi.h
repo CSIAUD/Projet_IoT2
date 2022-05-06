@@ -22,7 +22,9 @@ WiFiMulti wifiMulti;
  * @param pwd Nouveau PWD
  */
 void saveWifi(String ssid, String pwd){
-    spiffsSet("wifis", ssid, pwd);
+  JsonObject obj;
+  obj[ssid] = pwd;
+  spiffsSet("wifis", obj);
 }
 
 /**
