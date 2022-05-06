@@ -17,7 +17,6 @@
  */
 void setup() {
   setupDebug();
-  testSpiffs();
 }
 
 void loop() {
