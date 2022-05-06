@@ -23,9 +23,9 @@ WiFiMulti wifiMulti;
 void multiConnect(){
     JsonObject wifis = spiffsGet("wifis");
     if(wifis.size() > 0){
-        for(JsonVariant wifi : wifis){
-            wifiMulti.add(
-                    wifi.key().c-str(), // Le SSID
+        for(JsonPair wifi : wifis){
+            wifiMulti.addAP(
+                    wifi.key().c_str(), // Le SSID
                     wifi.value().as<const char*>() // Le MDP
                 );
         }
@@ -70,13 +70,13 @@ bool newConnection(char sta_ssid[], char sta_pwd[]){
     connectionCount++;
     MYDEBUG_PRINT(".");
   }
-  
+
   if(WiFi.status() != WL_CONNECTED){
     return false;
   }else{
     MYDEBUG_PRINTLN(WiFi.SSID());
     MYDEBUG_PRINTLN("== Connecté =========");
-    saveWifi(sta_ssid, sta_pwd);
+    // saveWifi(sta_ssid, sta_pwd);
     return true;
   }
 }
