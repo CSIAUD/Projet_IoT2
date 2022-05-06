@@ -15,6 +15,10 @@
 
 WiFiMulti wifiMulti; 
 
+void saveWifi(String ssid, String pwd){
+    spiffsSet("wifis", ssid, pwd);
+}
+
 /**
  * @brief Tente la connexion en WifiMulti.
  * Get l'objet wifis dans le fichier de SPIFFS
@@ -76,7 +80,7 @@ bool newConnection(char sta_ssid[], char sta_pwd[]){
   }else{
     MYDEBUG_PRINTLN(WiFi.SSID());
     MYDEBUG_PRINTLN("== Connecté =========");
-    // saveWifi(sta_ssid, sta_pwd);
+    saveWifi(sta_ssid, sta_pwd);
     return true;
   }
 }
