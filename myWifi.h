@@ -15,6 +15,12 @@
 
 WiFiMulti wifiMulti; 
 
+/**
+ * @brief Sauvegarde un wifi dans le fichier de SPIFFS
+ * 
+ * @param ssid Nouveau SSID
+ * @param pwd Nouveau PWD
+ */
 void saveWifi(String ssid, String pwd){
     spiffsSet("wifis", ssid, pwd);
 }
@@ -54,11 +60,6 @@ void multiConnect(){
  * @return false 
  */
 bool newConnection(char sta_ssid[], char sta_pwd[]){
-  
-//   char sta_ssid[30];
-//   char sta_pwd[30];
-//   sta_ssid1.toCharArray(sta_ssid,sizeof(sta_ssid1)+1);
-//   sta_pwd1.toCharArray(sta_pwd,sizeof(sta_pwd1)+1);
 
   int connectionCount = 0;
   
