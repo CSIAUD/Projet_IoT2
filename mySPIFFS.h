@@ -155,12 +155,3 @@ void reset(){
     // webServer.sendHeader("Location", "/",true);
     // webServer.send(302, "text/plane",""); 
 }
-
-/**
- * @brief Simple fonction de test
- * 
- */
-void testSpiffs(){
-  setDefault();
-  display(spiffsGet("config"));
-}
