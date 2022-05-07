@@ -110,6 +110,55 @@ void handleConfig() {
 }
 
 /**
+ * @brief Affichage et configuration du server
+ * */
+void handleConnect() {
+  MYDEBUG_PRINTLN("Serveur => req connect");
+  if(newConnection(webServer.arg("ssid"),webServer.arg("pwd"))){
+    DEBUG_PRINTLN("");
+    DEBUG_PRINTLN("Connexion OK");
+
+    //Redirect to our html 
+    webServer.sendHeader("Location", "/?connected=true",true); 
+    webServer.send(302, "text/plane",""); 
+  }else{
+    MYDEBUG_PRINTLN("");
+    MYDEBUG_PRINTLN("Connexion RIP");
+
+    //Redirect to our html 
+    webServer.sendHeader("Location", "/config?connected=false&ssid="+webServer.arg("ssid"),true); 
+    webServer.send(302, "text/plane",""); 
+  }
+}
+
+/**
+ * @brief En cas d'erreur au niveau du serveur
+ * */
+void handleNotFound(){
+  MYDEBUG_PRINTLN("Serveur => erreur de route");
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += webServer.uri();
+  message += "\nMethod: ";
+  message += (webServer.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += webServer.args();
+  message += "\n";
+  for (uint8_t i = 0; i < webServer.args(); i++) {
+    message += " " + webServer.argName(i) + ": " + webServer.arg(i) + "\n";
+  }
+  webServer.send(404, "text/plain", message);
+}
+
+/**
+ * @brief lancement du scan Bluetooth
+ * 
+ */
+void handleScanBle(){
+  loopBLEClient();
+}
+
+/**
  * @brief Setup du serveur
  * */
 void setupWebServer(){
@@ -120,6 +169,9 @@ void setupWebServer(){
   webServer.on("/reset", handleReset);
   webServer.on("/wifi", handleWifiScan);
   webServer.on("/config", handleConfig);
+  webServer.on("/connect", handleConnect);
+  webServer.on("/ble", handleScanBle);
+  webServer.onNotFound(handleNotFound);
 
   //Démarrage du serveur
   webServer.begin();                                  
