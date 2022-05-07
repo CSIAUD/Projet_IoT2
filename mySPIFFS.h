@@ -119,45 +119,6 @@ void setDefault(){
   } else {
     MYDEBUG_PRINT("-SPIFFS : Impossible de monter le système de fichier");
   }
-
-
-
-
-
-
-
-  // if(SPIFFS.begin()){
-  //   File file = SPIFFS.open(strConfigFile, "w");
-  //   if (file){
-  //     DynamicJsonDocument doc(512);
-  //     JsonArray base = doc.to<JsonArray>();
-
-  //     JsonObject config;
-  //     config["ssid"] = "IoTeam";
-  //     config["pwd"] = "29052022";
-  //     JsonObject wifis;
-  //     wifis["Creanics"] = "moimoimoi";
-
-  //     base.add(config);
-  //     base.add(wifis);
-
-  //     MYDEBUG_PRINTLN(">>>>>>>>>>>>>>>>>>>>");
-  //     display(doc["config"]);
-  //     MYDEBUG_PRINTLN("----------");
-  //     display(doc["wifis"]);
-  //     MYDEBUG_PRINTLN("<<<<<<<<<<<<<<<<<<<<");
-
-  //     if(serializeJson(doc, file) == 0){
-  //       MYDEBUG_PRINTLN("Erreur SerializeJson default");
-  //     }else{
-  //       MYDEBUG_PRINTLN("VVVVV Test apres serialisation VVVVV");
-  //       display(spiffsGet("config"));
-  //     }
-  //   }else{
-  //     MYDEBUG_PRINTLN("Ereur default Ouverture");
-  //   }
-  //   SPIFFS.end();
-  // }
 }
 
 /**
@@ -167,8 +128,8 @@ void setDefault(){
 void reset(){
   SPIFFS.format();
   setDefault();
-  // webServer.sendHeader("Location", "/",true);
-  // webServer.send(302, "text/plane",""); 
+  webServer.sendHeader("Location", "/",true);
+  webServer.send(302, "text/plane",""); 
 }
 
 /**
