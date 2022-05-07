@@ -16,6 +16,18 @@
 WiFiMulti wifiMulti; 
 
 /**
+ * @brief Sauvegarde un wifi dans le fichier de SPIFFS
+ * 
+ * @param ssid Nouveau SSID
+ * @param pwd Nouveau PWD
+ */
+void saveWifi(String ssid, String pwd){
+  JsonObject obj;
+  obj[ssid] = pwd;
+  spiffsSet("wifis", obj);
+}
+
+/**
  * @brief Tente la connexion en WifiMulti.
  * Get l'objet wifis dans le fichier de SPIFFS
  * Si au moins 1 wifis de sauvegardé tentative de connexion
