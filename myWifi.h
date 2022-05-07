@@ -15,17 +15,6 @@
 
 WiFiMulti wifiMulti; 
 
-/**
- * @brief Sauvegarde un wifi dans le fichier de SPIFFS
- * 
- * @param ssid Nouveau SSID
- * @param pwd Nouveau PWD
- */
-void saveWifi(String ssid, String pwd){
-  JsonObject obj;
-  obj[ssid] = pwd;
-  spiffsSet("wifis", obj);
-}
 
 /**
  * @brief Tente la connexion en WifiMulti.
@@ -45,7 +34,7 @@ void multiConnect(){
       if(wifiMulti.run() == WL_CONNECTED) { // Connexion
         MYDEBUG_PRINTLN("");
         MYDEBUG_PRINT("Connecté à ");
-        MYDEBUG_PRINTLN(WiFI.SSID());
+        MYDEBUG_PRINTLN(WiFi.SSID());
         MYDEBUG_PRINTLN("@IP : ");
         MYDEBUG_PRINTLN(WiFi.localIP());
       }else{
