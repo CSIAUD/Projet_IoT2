@@ -24,11 +24,11 @@
  * 
  */
 
+#include "FS.h"
 #include "SPIFFS.h"
 #include <ArduinoJson.h>   
 
-String strConfigFile("/config.txt");
-DynamicJsonDocument doc(512);
+String strConfigFile("/config.json");
 
 /**
  * @brief Affichage d'un JsonObject
@@ -46,43 +46,37 @@ void display(JsonObject obj){
 }
 
 /**
- * @brief Permet de sauvegarder une valeur
- * Crée un nouveau path dans le fichier s'il n'existe pas
+ * @brief Permet la récupération d'un Json Object en fonction du sPath.
  * 
- * @param sPath L'endroit dans lequel stocker l'objet
- * @param newObj L'objet à stocker
+ * @param sPath Chemin d'acces dans le spiffs
+ * @return JsonObject (vide si non trouvé)
  */
-void spiffsSet(String sPath, JsonObject newObj){
+JsonObject spiffsGet(String sPath){
+  MYDEBUG_PRINTLN("GET");
+  JsonObject obj;
+
   if(SPIFFS.begin(true)){
-    File file = SPIFFS.open(strConfigFile, "w+");
-
-    if (file){
-      JsonObject obj;
-      DeserializationError error = deserializeJson(doc, file);
-      if (error) {
-          MYDEBUG_PRINT("deserializeJson() failed: ");
-          MYDEBUG_PRINTLN(error.c_str());
-          return;
-      }
-      if(doc.containsKey(sPath)){
-          obj = doc[sPath];
-      }else{
-          obj = doc.createNestedObject(sPath);
-      }
+    File configFile = SPIFFS.open(strConfigFile, "r");
+    if (configFile) {
+      DynamicJsonDocument jsonDocument(512);
       
-      for(JsonPair elem : newObj){
-        obj[elem.key().c_str()] = elem.value().as<const char*>();
+      DeserializationError error = deserializeJson(jsonDocument, configFile);
+      if (error){
+        MYDEBUG_PRINTLN("-SPIFFS : Impossible de parser le JSON");  
+        return obj;        
       }
-      doc.add(obj);
-
-      display(doc["config"]);
-      if(serializeJson(doc, file) == 0){
-          MYDEBUG_PRINTLN("Erreur SerializeJson Set");
+      if(jsonDocument.containsKey(sPath)){
+          obj = jsonDocument[sPath];
       }
+      configFile.close();
     }else{
-      MYDEBUG_PRINTLN("Ereur Ouverture");
+      MYDEBUG_PRINTLN("Ereur Get Ouverture");
     }
+    SPIFFS.end();
+  }else{
+    MYDEBUG_PRINTLN("Ereur Get SPIFFS");
   }
+  return obj;
 }
 
 /**
@@ -96,53 +90,74 @@ void spiffsSet(String sPath, JsonObject newObj){
  */
 void setDefault(){
   MYDEBUG_PRINTLN("default");
-  const size_t CAPACITY = JSON_OBJECT_SIZE(1);
-  StaticJsonDocument<CAPACITY> doc;
 
-  // create an object
-  JsonObject config = doc.to<JsonObject>();
-  config["ssid"] = "IoTeam";
-  config["pwd"] = "29052022";
+  if (SPIFFS.begin(true)) {
+    MYDEBUG_PRINTLN("-SPIFFS : MONTE");
+    File configFile = SPIFFS.open(strConfigFile, "w");
+    if (configFile) {
+      MYDEBUG_PRINTLN("-SPIFFS: Fichier créé");
+      DynamicJsonDocument jsonDocument(512);
 
-  spiffsSet("config", config);
-}
+      JsonObject config = jsonDocument.createNestedObject("config");
+      JsonObject wifis = jsonDocument.createNestedObject("wifis");
 
-/**
- * @brief Permet la récupération d'un Json Object en fonction du sPath.
- * 
- * @param sPath Chemin d'acces dans le spiffs
- * @return JsonObject (vide si non trouvé)
- */
-JsonObject spiffsGet(String sPath){
-  JsonObject obj;
+      config["ssid"] = "IoTeam";
+      config["pwd"] = "29052022";
+      jsonDocument.add(config);
+      jsonDocument.add(wifis);
 
-  if(SPIFFS.begin(true)){
-    if (SPIFFS.exists(strConfigFile)) { 
-      File file = SPIFFS.open(strConfigFile, "r");
-
-      if (file){
-        DeserializationError error = deserializeJson(doc, file);
-        if (error) {
-            MYDEBUG_PRINT("deserializeJson() Get failed: ");
-            MYDEBUG_PRINTLN(error.c_str());
-            file.close();
-            setDefault();
-            return obj;
-        }
-        if(doc.containsKey(sPath)){
-            obj = doc[sPath];
-        }
-      }else{
-        MYDEBUG_PRINTLN("Ereur Get Ouverture");
+      if (serializeJson(jsonDocument, configFile) == 0) {
+        MYDEBUG_PRINTLN("-SPIFFS : Impossible d'écrire le JSON dans le fichier de configuration");
       }
-    } else {
-      MYDEBUG_PRINTLN("Ereur Get Fichier inexistant");
-      SPIFFS.end();
-      setDefault();
+      // Fermeture du fichier
+      configFile.close();
+      MYDEBUG_PRINTLN("-SPIFFS : Fichier fermé");
+    } else{
+      MYDEBUG_PRINTLN("-SPIFFS : Impossible d'ouvrir le fichier en ecriture");
     }
-    SPIFFS.end();
+    SPIFFS.end();  
+  } else {
+    MYDEBUG_PRINT("-SPIFFS : Impossible de monter le système de fichier");
   }
-  return obj;
+
+
+
+
+
+
+
+  // if(SPIFFS.begin()){
+  //   File file = SPIFFS.open(strConfigFile, "w");
+  //   if (file){
+  //     DynamicJsonDocument doc(512);
+  //     JsonArray base = doc.to<JsonArray>();
+
+  //     JsonObject config;
+  //     config["ssid"] = "IoTeam";
+  //     config["pwd"] = "29052022";
+  //     JsonObject wifis;
+  //     wifis["Creanics"] = "moimoimoi";
+
+  //     base.add(config);
+  //     base.add(wifis);
+
+  //     MYDEBUG_PRINTLN(">>>>>>>>>>>>>>>>>>>>");
+  //     display(doc["config"]);
+  //     MYDEBUG_PRINTLN("----------");
+  //     display(doc["wifis"]);
+  //     MYDEBUG_PRINTLN("<<<<<<<<<<<<<<<<<<<<");
+
+  //     if(serializeJson(doc, file) == 0){
+  //       MYDEBUG_PRINTLN("Erreur SerializeJson default");
+  //     }else{
+  //       MYDEBUG_PRINTLN("VVVVV Test apres serialisation VVVVV");
+  //       display(spiffsGet("config"));
+  //     }
+  //   }else{
+  //     MYDEBUG_PRINTLN("Ereur default Ouverture");
+  //   }
+  //   SPIFFS.end();
+  // }
 }
 
 /**
@@ -150,8 +165,20 @@ JsonObject spiffsGet(String sPath){
  * Puis redirection sur la page d'accueil
  */
 void reset(){
-    SPIFFS.format();
-    setDefault();
-    // webServer.sendHeader("Location", "/",true);
-    // webServer.send(302, "text/plane",""); 
+  SPIFFS.format();
+  setDefault();
+  // webServer.sendHeader("Location", "/",true);
+  // webServer.send(302, "text/plane",""); 
+}
+
+/**
+ * @brief Sauvegarde un wifi dans le fichier de SPIFFS
+ * 
+ * @param ssid Nouveau SSID
+ * @param pwd Nouveau PWD
+ */
+void saveWifi(String ssid, String pwd){
+  JsonObject obj;
+  obj[ssid] = pwd;
+  // spiffsSet("wifis", obj);
 }
