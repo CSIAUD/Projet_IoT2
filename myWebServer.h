@@ -80,6 +80,36 @@ void handleReset(){
 }
 
 /**
+ * @brief Affichage et configuration du Wifi
+ * */
+void handleConfig() {
+  MYDEBUG_PRINTLN("Serveur => req config");
+
+  String out = "";
+  out += "<html><head><meta http-equiv='refresh' content='30'/>";
+  out += "<title>Projet IoT - Config</title>";
+  out += "<meta charset = 'utf-8'>";
+  out += "<style>body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }</style>";
+  out += "</head><body>";
+  out += "<h1>Page de config</h1>";
+  out += "<form action='/connect' style='display: flex; flex-direction: column; width: 150px;'>";
+  out += "<input name='ssid' type='text' placeholder='SSID' value='";
+  if(webServer.arg("ssid") != ""){
+    out += webServer.arg("ssid");
+  }
+  out += "'>";
+  out += "<input name='pwd' type='text' placeholder='Mot de Passe'>";
+  out += "<input value='Connexion' type='submit'>";
+  out += "</form>";
+  
+  if(webServer.arg("connected") == "false"){
+    out += "<h1 style='color: red;'>Connexion échouée</h1>";
+  }
+  out += "</body></html>";
+  webServer.send(200, "text/html", out);
+}
+
+/**
  * @brief Setup du serveur
  * */
 void setupWebServer(){
@@ -89,6 +119,7 @@ void setupWebServer(){
   webServer.on("/", handleRoot);
   webServer.on("/reset", handleReset);
   webServer.on("/wifi", handleWifiScan);
+  webServer.on("/config", handleConfig);
 
   //Démarrage du serveur
   webServer.begin();                                  
