@@ -10,6 +10,7 @@
 #include "Debug.h"
 #include "mySPIFFS.h"
 #include "myWifi.h"
+#include "myWebServer.h"
 
 /**
  * \brief Initialisation des fonctionnalités
@@ -17,7 +18,11 @@
  */
 void setup() {
   setupDebug();
+  setupWifi();
+  setupWebServer();
 }
 
 void loop() {
+  loopWebServer();
+  delay(5);
 }
