@@ -24,11 +24,10 @@
  * 
  */
 
-#include "FS.h"
 #include "SPIFFS.h"
 #include <ArduinoJson.h>   
 
-String strConfigFile("/config.json");
+String strConfigFile("/config.txt");
 
 /**
  * @brief Affichage d'un JsonObject
@@ -62,7 +61,8 @@ JsonObject spiffsGet(String sPath){
       
       DeserializationError error = deserializeJson(jsonDocument, configFile);
       if (error){
-        MYDEBUG_PRINTLN("-SPIFFS : Impossible de parser le JSON");  
+        MYDEBUG_PRINT("deserializeJson() failed: ");
+        MYDEBUG_PRINTLN(error.c_str());
         return obj;        
       }
       if(jsonDocument.containsKey(sPath)){
@@ -139,7 +139,41 @@ void reset(){
  * @param pwd Nouveau PWD
  */
 void saveWifi(String ssid, String pwd){
-  JsonObject obj;
-  obj[ssid] = pwd;
-  // spiffsSet("wifis", obj);
+  if (SPIFFS.begin(true)) {
+    MYDEBUG_PRINTLN("-SPIFFS : MONTE");
+    File configFile = SPIFFS.open(strConfigFile, "r+");
+    if (configFile) {
+      DynamicJsonDocument jsonDocument(512);
+      
+      DeserializationError error = deserializeJson(jsonDocument, configFile);
+
+      MYDEBUG_PRINTLN("#####");
+      display(jsonDocument.as<JsonObject>());
+      MYDEBUG_PRINTLN("#####");
+      if (error) {
+          MYDEBUG_PRINT("deserializeJson() failed: ");
+          MYDEBUG_PRINTLN(error.c_str());
+          return;
+      }
+
+      if(jsonDocument.containsKey("wifis")){
+        jsonDocument["wifis"][ssid] = pwd;
+      } else {
+        JsonObject wifis = jsonDocument.createNestedObject("wifis");
+        wifis[ssid] = pwd;
+        jsonDocument["wifis"].add(wifis);
+      }
+      if (serializeJson(jsonDocument, configFile) == 0) {
+        MYDEBUG_PRINTLN("-SPIFFS : Impossible d'écrire le JSON dans le fichier de configuration");
+      }
+
+      configFile.close();
+      MYDEBUG_PRINTLN("-SPIFFS : Fichier fermé");
+    } else{
+      MYDEBUG_PRINTLN("-SPIFFS : Impossible d'ouvrir le fichier en ecriture");
+    }
+    SPIFFS.end();  
+  } else {
+    MYDEBUG_PRINT("-SPIFFS : Impossible de monter le système de fichier");
+  }
 }

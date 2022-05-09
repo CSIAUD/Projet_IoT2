@@ -12,9 +12,9 @@
 void handleRoot(){
   MYDEBUG_PRINTLN("Serveur => req root");
 
-  JsonObject wifi = spiffsGet("config");
-  String ap_ssid = wifi["ssid"];
-  String ap_pwd = wifi["pwd"];
+  JsonObject config = spiffsGet("config");
+  String ap_ssid = config["ssid"];
+  String ap_pwd = config["pwd"];
 
   String out = "";
   out += "<html><head><meta http-equiv='refresh' content='30'/>";
@@ -27,17 +27,18 @@ void handleRoot(){
   out +="<li><a href=\"wifi\"> Scanner le WiFi</a></li>";
   out +="<li><a href=\"ble\"> Scanner les Bluetooth</a></li>";
   out +="<li><a href=\"config\"> Configuration manuelle du WiFi </a></li>";
+  out +="<li><a href=\"list\"> Afficher les wifis connus </a></li>";
   out +="<li><a href=\"reset\"> Rétablissement des paramètres d'usine </a></li></ul>";
   if(WiFi.status() == WL_CONNECTED){
-    out += "<h2>Connecté à " + WiFi.SSID() + "</h>";
+    out += "<h2>Connecté à " + WiFi.SSID() + "</h2>";
   }
-  out += "<p>Nom réseau : " + String(ap_ssid) + "<br>Mot de passe : " + String(ap_pwd) + "</p>";
+  out += "<h2>Nom réseau : " + WiFi.softAPSSID() + "</h2>";
   out += "</body></html>";
   webServer.send(200, "text/html", out);
 }
 
 /**
- * @brief 
+ * @brief Scan et affiche les wifis à proximité
  * 
  */
 void handleWifiScan(){
@@ -80,7 +81,7 @@ void handleReset(){
 }
 
 /**
- * @brief Affichage et configuration du Wifi
+ * @brief Configuration du Wifi
  * */
 void handleConfig() {
   MYDEBUG_PRINTLN("Serveur => req config");
@@ -115,8 +116,8 @@ void handleConfig() {
 void handleConnect() {
   MYDEBUG_PRINTLN("Serveur => req connect");
   if(newConnection(webServer.arg("ssid"),webServer.arg("pwd"))){
-    DEBUG_PRINTLN("");
-    DEBUG_PRINTLN("Connexion OK");
+    MYDEBUG_PRINTLN("");
+    MYDEBUG_PRINTLN("Connexion OK");
 
     //Redirect to our html 
     webServer.sendHeader("Location", "/?connected=true",true); 
@@ -155,7 +156,42 @@ void handleNotFound(){
  * 
  */
 void handleScanBle(){
-  loopBLEClient();
+  // loopBLEClient();
+}
+
+/**
+ * @brief Affiche les wifis stockés
+ * 
+ */
+void handleWifiList(){
+  MYDEBUG_PRINTLN("Serveur => req list");
+
+  JsonObject list = spiffsGet("wifis");
+
+  String out = "";
+  out += "<html><head>";
+  out += "<meta http-equiv='refresh' content='5'/>";
+  out += "<title>Projet IoT - Scan</title>";
+  out += "<meta charset = 'utf-8'>";
+  out += "<style>body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }</style>";
+  out += "</head><body>";
+  out += "<h1>Page de scan</h1><br>";
+
+  if(list.size() == 0){
+    MYDEBUG_PRINTLN("Aucun Wifi enregistré");
+    out += "<h3>Aucun Wifi enregistré</h3>";
+
+  } else {
+    out += "Liste des wifis connus :";
+    out += "<ul>";
+    for(JsonPair item : list){
+      out += "<li>" + String(item.key().c_str()) + "</li>";
+    }
+    out += "</ul>";
+  }
+  out += "</body></html>";
+  
+  webServer.send(200, "text/html", out);
 }
 
 /**
@@ -171,6 +207,7 @@ void setupWebServer(){
   webServer.on("/config", handleConfig);
   webServer.on("/connect", handleConnect);
   webServer.on("/ble", handleScanBle);
+  webServer.on("/list", handleWifiList);
   webServer.onNotFound(handleNotFound);
 
   //Démarrage du serveur

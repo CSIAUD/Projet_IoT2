@@ -51,9 +51,13 @@ void multiConnect(){
  * @return true 
  * @return false 
  */
-bool newConnection(char sta_ssid[], char sta_pwd[]){
-
+bool newConnection(String ssid, String pwd){
+  char sta_ssid[30];
+  char sta_pwd[30];
   int connectionCount = 0;
+
+  ssid.toCharArray(sta_ssid,sizeof(ssid)+1);
+  pwd.toCharArray(sta_pwd,sizeof(pwd)+1);
   
   MYDEBUG_PRINTLN("===== Connexion =====");
   
